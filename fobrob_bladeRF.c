@@ -262,6 +262,8 @@ int main(int argc, char *argv[])
         goto out;
     }
 
+    size_t clipping_warning_count = 0;
+
     while (status == 0 && !done) {
         /* Receive samples */
         status = bladerf_sync_rx(dev, rx_samples, samples_len, NULL, 5000);
@@ -291,8 +293,15 @@ int main(int argc, char *argv[])
 
                 demodSample(&demodCtx, sample);
             }
+
             if (clipping) {
-                fprintf(stderr, "Signal may be clipping! Try reducing gain\n");
+                // instead of spamming the console, do some crude rate-limiting
+                if (clipping_warning_count == 0) {
+                    fprintf(stderr, "Signal may be clipping! Try reducing gain\n");
+                    clipping_warning_count += 100;
+                }
+            } else if (clipping_warning_count > 0) {
+                clipping_warning_count--;
             }
         } else {
             fprintf(stderr, "Failed to RX samples: %s\n",
