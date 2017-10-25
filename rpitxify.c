@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 
 	/* Turn hex string into binary */
 	unsigned char decoded[10];
-	dehexify(decoded, hexString, 10);
+	dehexify(decoded, (unsigned char*)hexString, 10);
 
 	/* Manchester encode it */
 	unsigned char encoded[20];

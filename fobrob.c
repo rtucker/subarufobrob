@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 //	uint32_t sampleRate = 995840;// 1024 raw samples per bit at 995840Hz samplerate
 	uint32_t sampleRate = 972500; // 1000 raw samples per bit at 972500Hz samplerate
 	int decimation1 = 5; // We're going from ~1Mhz to ~200Khz
-        int samplesPerSymbol = 200; // at ~200Khz we're getting exactly 200 samples per bit
+	int samplesPerSymbol = 200; // at ~200Khz we're getting exactly 200 samples per bit
 	uint16_t buf[DEFAULT_BUF_LENGTH / sizeof(uint16_t)];
 	int minPreambleBits = 42;
 	int maxPreambleTimingError = 40; // Might be a little high but reduces false positives by a LOT
@@ -180,7 +180,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Build look-up table for float conversion */
-	ComplexSample lut[0x10000];;
+	ComplexSample lut[0x10000];
 	for (unsigned int i = 0; i < 0x10000; i++)
 	{
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 		lut[i].q = (((float)(i >> 8)) - 127.4f) * (1.0f/128.0f);
 #else // BIG_ENDIAN
 		lut[i].i = (((float)(i >> 8)) - 127.4f) * (1.0f/128.0f);
-		lut[i].q = (((float)(i & 0xff) - 127.4f) * (1.0f/128.0f);
+		lut[i].q = (((float)(i & 0xff)) - 127.4f) * (1.0f/128.0f);
 #endif
 	}
 

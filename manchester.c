@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* manchester_decode(char* dest, char*src, int len)
+unsigned char* manchester_decode(unsigned char* dest, const unsigned char* src, int len)
 {
 	int bitnum = 0;
 	int pos = 0;
@@ -66,7 +66,7 @@ char* manchester_decode(char* dest, char*src, int len)
 	return dest;
 }
 
-char *manchester_encode(char* dest, char*src, int len)
+unsigned char* manchester_encode(unsigned char* dest, const unsigned char* src, int len)
 {
 	int bitnum = 0;
 	int pos = 0;

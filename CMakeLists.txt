@@ -13,7 +13,11 @@ if(NOT USB_LIB)
 	  message(FATAL_ERROR "rtlsdr library not found")
 endif()
 
-add_compile_options("-std=c99")
+#add_compile_options("-std=c99")
+add_definitions(-Wall)
+add_definitions(-Wextra)
+add_definitions(-Wno-unused-parameter)
+add_definitions(-Werror)
 
 add_library(encoding STATIC hex.c manchester.c)
 add_library(runningavg STATIC runningavg.c)

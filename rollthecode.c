@@ -65,11 +65,9 @@ int main(int argc, char** argv)
 	else if (strcmp(argv[1], "panic") == 0) forceCommand = COMMAND_PANIC;
 	else
 	{
-		fprintf(stderr, "Dunno what %s means, use \"lock\", \"unlock\" or \"trunk\"\n", argv[2]);
+		fprintf(stderr, "Dunno what %s means, use \"lock\", \"unlock\" or \"trunk\" or \"panic\"\n", argv[2]);
 		return -1;
 	}
-
-	int n = 0;
 
 	if (strlen(hexString) != 20)
 	{
@@ -81,10 +79,7 @@ int main(int argc, char** argv)
 
 	unsigned char decoded[10];
 
-	dehexify(decoded, hexString, 10);
-
-	unsigned char mycsum = calcCSum(decoded);;
-	unsigned char csum = getCSum(decoded);
+	dehexify(decoded, (unsigned char*)hexString, 10);
 
 	int rollingCode = getCode(decoded);
 
