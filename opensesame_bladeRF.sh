@@ -39,4 +39,5 @@ bladeRF-cli -e "set frequency tx 433820000; \
 				set bandwidth tx 1500000; \
 				set txvga1 -8; set txvga2 20; \
 				tx config file=/dev/shm/output.csv format=csv; \
-				tx start" 
+				tx start; \
+				tx wait"
