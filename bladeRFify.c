@@ -17,6 +17,8 @@
 /*
  * bladeRF-cli -e "set frequency tx 433820000; set samplerate tx 4000000; \
  * tx config file=bleh.txt format=csv; tx start" 
+ *
+ * consider also: set txvga1 -8; set txvga2 20
  */
 
 const double CARRIER_FREQ = 100e3;
@@ -35,7 +37,7 @@ void modulate(double* i, double* q, int a)
     ++count;
 }
 
-void writeAm(int fd, int a, uint32_t Timing)
+void writeAm(FILE *fp, int a, uint32_t Timing)
 {
     const size_t NS_PER_SAMPLE = 1e9/SAMPLE_RATE;
     size_t samples = Timing/NS_PER_SAMPLE;
@@ -44,7 +46,9 @@ void writeAm(int fd, int a, uint32_t Timing)
         double i, q;
         modulate(&i, &q, a);
 
-        if (0 > dprintf(fd, "%d,%d\n", (int)i, (int)q)) {
+        //printf("i=%g q=%g int_i=%d int_q=%d\n", i, q, (int)i, (int)q);
+
+        if (0 > fprintf(fp, "%d,%d\n", (int)i, (int)q)) {
             fprintf(stderr, "Unable to write sample\n");
             return;
         }
@@ -77,28 +81,28 @@ int main(int argc, char** argv)
     unsigned char encoded[20];
     manchester_encode(encoded, decoded, 10);
     
-    int fd = open(outFile, O_WRONLY|O_CREAT, 0644);
+    FILE *fp = fopen(outFile, "w");
 
     /* test padding */
-    //writeAm(fd, 0, 5000000);
-    //writeAm(fd, 1, 5000000);
-    //writeAm(fd, 0, 5000000);
+    // writeAm(fp, 0, 5000000);
+    // writeAm(fp, 1, 5000000);
+    // writeAm(fp, 0, 5000000);
 
     /* preamble */
     for (int i = 0; i < 128; i++)
     {
-        writeAm(fd, MAGNITUDE_0, nsecsPerBit);
-        writeAm(fd, MAGNITUDE_1, nsecsPerBit);
+        writeAm(fp, MAGNITUDE_0, nsecsPerBit);
+        writeAm(fp, MAGNITUDE_1, nsecsPerBit);
     }
     printf("\n");
-    writeAm(fd, 0, 4 * nsecsPerBit);
+    writeAm(fp, 0, 4 * nsecsPerBit);
 
     /* Code */
     printf("Bit code: ");
     for (int i= 0; i < 160; i++) 
     {
         int bit = encoded[i / 8] & ( 1 << ( 7 - (i % 8)));
-        writeAm(fd, bit ? MAGNITUDE_1 : MAGNITUDE_0, nsecsPerBit);
+        writeAm(fp, bit ? MAGNITUDE_1 : MAGNITUDE_0, nsecsPerBit);
         printf("%d", bit ? 1 : 0);
         if (i % 8 == 7) {
             printf(" ");
@@ -107,17 +111,16 @@ int main(int argc, char** argv)
     printf("\n");
 
     /* Padding */
-    writeAm(fd, 0, 8 * nsecsPerBit);
+    writeAm(fp, 0, 8 * nsecsPerBit);
 
     /* Code */
     for (int i= 0; i < 160; i++) 
     {
         int bit = encoded[i / 8] & ( 1 << ( 7 - (i % 8)));
-        writeAm(fd, bit ? MAGNITUDE_1 : MAGNITUDE_0, nsecsPerBit);
+        writeAm(fp, bit ? MAGNITUDE_1 : MAGNITUDE_0, nsecsPerBit);
     }
 
-    close(fd);
+    fclose(fp);
 
     return 0;
 }
-
